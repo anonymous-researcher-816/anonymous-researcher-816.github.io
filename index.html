@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VENUSX Benchmark Leaderboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .highlight-gold   { background-color: #fef3c7; color: #92400e; } /* 2nd - Light Yellow */
+        .highlight-silver { background-color: #f3f4f6; color: #1f2937; } /* 3rd - Light Gray */
+        .highlight-bronze { background-color: #fee2e2; color: #991b1b; } /* 1st - Light Red */
+        
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        
+        .sticky-header th { 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            background-color: #f9fafb; 
+        }
+
+        th[data-sortable] {
+            cursor: pointer;
+        }
+        .sort-arrow {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            margin-left: 0.25rem;
+            opacity: 0.5;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        th[data-sortable]:hover .sort-arrow {
+            opacity: 1;
+        }
+        .sort-arrow.asc {
+            transform: rotate(180deg);
+        }
+        .sort-arrow.desc {
+            transform: rotate(0deg);
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #e5e7eb; }
+        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">VENUS<span class="text-blue-500">X</span></h1>
+                    <span class="ml-4 text-gray-500 hidden md:inline">Fine-Grained Protein Understanding Benchmark</span>
+                </div>
+                <div class="flex items-center">
+                    <nav class="hidden md:flex items-center space-x-4">
+                        <a href="#tasks" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Benchmark Tasks</a>
+                        <a href="#leaderboards" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Leaderboards</a>
+                        <a href="https://anonymous.4open.science/r/VenusX-4674" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                            Code & Data
+                        </a>
+                    </nav>
+                    <button id="mobile-menu-button" class="md:hidden p-2 ml-2 text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+         <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#tasks" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900">Benchmark Tasks</a>
+                <a href="#leaderboards" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900">Leaderboards</a>
+                <a href="https://anonymous.4open.science/r/VenusX-4674" target="_blank" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900">Code & Data</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Hero Section -->
+        <section class="text-center mb-20">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+                VENUSX Benchmark Leaderboard
+            </h2>
+            <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">
+                The first comprehensive, multi-level benchmark for fine-grained protein understanding. VENUSX evaluates models on residue, fragment, and pairwise similarity tasks to assess true biological knowledge capture beyond global properties.
+            </p>
+        </section>
+
+        <!-- Tasks Overview Section -->
+        <section id="tasks" class="mb-20">
+            <h3 class="text-3xl font-bold text-gray-900 text-center mb-10">Benchmark Task Categories</h3>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-lg p-6 border border-gray-200 transform hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-lg">
+                    <h4 class="text-xl font-semibold text-blue-500 mb-3">1. Residue-level Binary Classification</h4>
+                    <p class="text-gray-600">Identifies functionally important residues (e.g., active sites, binding sites) within a protein.</p>
+                </div>
+                <div class="bg-white rounded-lg p-6 border border-gray-200 transform hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-lg">
+                    <h4 class="text-xl font-semibold text-blue-500 mb-3">2. Fragment-level Multi-class Classification</h4>
+                    <p class="text-gray-600">Assigns annotated regions like domains and motifs to their corresponding InterPro families.</p>
+                </div>
+                <div class="bg-white rounded-lg p-6 border border-gray-200 transform hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-lg">
+                    <h4 class="text-xl font-semibold text-blue-500 mb-3">3. Pairwise Functional Similarity Scoring</h4>
+                    <p class="text-gray-600">Evaluates how well unsupervised representations capture functional similarity between protein pairs.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leaderboards Section -->
+        <section id="leaderboards">
+            <h3 class="text-3xl font-bold text-gray-900 text-center mb-10">Leaderboards</h3>
+
+            <!-- Leaderboard 1: Residue-level Classification (CROSS) -->
+            <div class="bg-white rounded-lg p-6 border border-gray-200 mb-12">
+                <h4 class="text-2xl font-semibold text-gray-900 mb-1">Residue-level Binary Classification (Cross-family)</h4>
+                <p class="text-gray-600 mb-2">Performance on Cross-family splits (Out-of-distribution). Higher is better.</p>
+                 <p class="text-xs text-gray-500 mb-6">
+                    <span class="font-semibold">Act:</span> Active Sites |
+                    <span class="font-semibold">BindI:</span> Binding Sites |
+                    <span class="font-semibold">Evo:</span> Conserved Sites |
+                    <span class="font-semibold">Motif:</span> Functional Motif |
+                    <span class="font-semibold">Dom:</span> Functional Domain
+                </p>
+                <div id="cross-residue-tabs-buttons" class="flex flex-wrap border-b border-gray-300 mb-6">
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-cross-interpro-act">Act (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-cross-interpro-bind">BindI (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-cross-interpro-evo">Evo (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-cross-interpro-motif">Motif (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-cross-interpro-dom">Dom (InterPro)</button>
+                </div>
+                <div class="table-responsive">
+                    <div id="tab-cross-interpro-act" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th><th class="px-4 py-2 text-center" data-sortable>Precision</th><th class="px-4 py-2 text-center" data-sortable>Recall</th><th class="px-4 py-2 text-center" data-sortable>F1-Positive</th><th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">0.185</td><td class="highlight-gold">0.241</td><td class="highlight-gold">0.072</td><td class="highlight-gold">0.110</td><td class="highlight-gold">0.538</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-gold">0.166</td><td>0.190</td><td>0.025</td><td>0.045</td><td>0.507</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-silver">0.156</td><td class="highlight-gold">0.241</td><td>0.014</td><td>0.026</td><td>0.498</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.143</td><td>0.278</td><td>0.060</td><td>0.098</td><td>0.533</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.131</td><td>0.131</td><td>0.020</td><td>0.035</td><td>0.501</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.143</td><td>0.126</td><td>0.031</td><td>0.050</td><td>0.507</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.114</td><td>0.132</td><td>0.036</td><td>0.056</td><td>0.510</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.101</td><td>0.019</td><td>0.001</td><td>0.002</td><td>0.485</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-cross-interpro-bind" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                             <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th><th class="px-4 py-2 text-center" data-sortable>Precision</th><th class="px-4 py-2 text-center" data-sortable>Recall</th><th class="px-4 py-2 text-center" data-sortable>F1-Positive</th><th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">0.230</td><td>0.634</td><td class="highlight-gold">0.135</td><td class="highlight-silver">0.223</td><td class="highlight-silver">0.599</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">0.182</td><td class="highlight-gold">0.661</td><td class="highlight-gold">0.135</td><td class="highlight-gold">0.224</td><td class="highlight-gold">0.600</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">0.182</td><td>0.379</td><td>0.029</td><td>0.053</td><td>0.514</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-silver">0.159</td><td>0.581</td><td>0.108</td><td>0.181</td><td>0.579</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.145</td><td>0.437</td><td>0.086</td><td>0.144</td><td>0.559</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.133</td><td>0.525</td><td>0.078</td><td>0.136</td><td>0.556</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.112</td><td>0.416</td><td>0.048</td><td>0.086</td><td>0.530</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.040</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.488</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-cross-interpro-evo" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th><th class="px-4 py-2 text-center" data-sortable>Precision</th><th class="px-4 py-2 text-center" data-sortable>Recall</th><th class="px-4 py-2 text-center" data-sortable>F1-Positive</th><th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.275</td><td>0.387</td><td class="highlight-bronze">0.169</td><td class="highlight-gold">0.235</td><td class="highlight-gold">0.595</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">0.274</td><td>0.456</td><td>0.111</td><td>0.178</td><td>0.568</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-silver">0.272</td><td>0.382</td><td class="highlight-gold">0.172</td><td class="highlight-gold">0.238</td><td class="highlight-silver">0.596</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.262</td><td class="highlight-gold">0.482</td><td>0.009</td><td>0.017</td><td>0.489</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.243</td><td>0.403</td><td>0.122</td><td>0.187</td><td>0.572</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.235</td><td>0.374</td><td>0.097</td><td>0.154</td><td>0.555</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.227</td><td>0.452</td><td>0.034</td><td>0.062</td><td>0.511</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.101</td><td>0.176</td><td>0.035</td><td>0.058</td><td>0.506</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-cross-interpro-motif" class="tab-content">
+                         <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th><th class="px-4 py-2 text-center" data-sortable>Precision</th><th class="px-4 py-2 text-center" data-sortable>Recall</th><th class="px-4 py-2 text-center" data-sortable>F1-Positive</th><th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                           <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.456</td><td>0.472</td><td>0.231</td><td>0.310</td><td>0.628</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.456</td><td class="highlight-gold">0.566</td><td>0.384</td><td class="highlight-silver">0.457</td><td class="highlight-silver">0.704</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">0.441</td><td>0.504</td><td>0.350</td><td>0.414</td><td>0.680</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-silver">0.433</td><td class="highlight-silver">0.510</td><td class="highlight-silver">0.432</td><td class="highlight-gold">0.467</td><td class="highlight-gold">0.707</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.408</td><td>0.485</td><td>0.411</td><td>0.445</td><td>0.695</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.394</td><td>0.499</td><td>0.303</td><td>0.377</td><td>0.662</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.390</td><td>0.390</td><td>0.365</td><td>0.412</td><td>0.678</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.329</td><td>0.329</td><td class="highlight-gold">0.453</td><td>0.399</td><td>0.661</td></tr>
+                           </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-cross-interpro-dom" class="tab-content">
+                         <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                             <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th><th class="px-4 py-2 text-center" data-sortable>Precision</th><th class="px-4 py-2 text-center" data-sortable>Recall</th><th class="px-4 py-2 text-center" data-sortable>F1-Positive</th><th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                           <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">0.564</td><td>0.572</td><td class="highlight-bronze">0.444</td><td class="highlight-bronze">0.500</td><td class="highlight-bronze">0.632</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">0.525</td><td>0.548</td><td>0.349</td><td>0.427</td><td>0.594</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-silver">0.508</td><td class="highlight-bronze">0.588</td><td>0.138</td><td>0.223</td><td>0.501</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.506</td><td>0.530</td><td class="highlight-gold">0.367</td><td class="highlight-gold">0.433</td><td class="highlight-gold">0.593</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.470</td><td>0.496</td><td>0.360</td><td>0.417</td><td>0.578</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.468</td><td>0.519</td><td>0.087</td><td>0.149</td><td>0.462</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.449</td><td>0.494</td><td>0.280</td><td>0.357</td><td>0.552</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                           </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard 2: Residue-level Classification (MIXED) -->
+            <div class="bg-white rounded-lg p-6 border border-gray-200 mb-12">
+                <h4 class="text-2xl font-semibold text-gray-900 mb-1">Residue-level Binary Classification (Mixed-family)</h4>
+                <p class="text-gray-600 mb-2">Performance on Mixed-family splits (In-distribution). Higher is better.</p>
+                <p class="text-xs text-gray-500 mb-6">
+                    <span class="font-semibold">Act:</span> Active Sites |
+                    <span class="font-semibold">BindI/BindB:</span> Binding Sites |
+                    <span class="font-semibold">Evo:</span> Conserved Sites |
+                    <span class="font-semibold">Motif:</span> Functional Motif |
+                    <span class="font-semibold">Dom:</span> Functional Domain |
+                    <span class="font-semibold">Epi:</span> Epitope Sites
+                </p>
+
+                <div id="mixed-residue-tabs-buttons" class="flex flex-wrap border-b border-gray-300 mb-6">
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-mixed-interpro-act">Act (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-mixed-interpro-bind">BindI (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-mixed-interpro-evo">Evo (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-mixed-interpro-motif">Motif (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-mixed-interpro-dom">Dom (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-mixed-bindb">BindB (BioLiP)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-mixed-epi">Epi (SAbDab)</button>
+                </div>
+
+                <div class="table-responsive">
+                    <!-- Tab Content for InterPro - Active Sites -->
+                    <div id="tab-mixed-interpro-act" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>F1-Positive</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.873</td><td class="highlight-bronze">0.862</td><td class="highlight-bronze">0.700</td><td class="highlight-bronze">0.773</td><td class="highlight-bronze">0.883</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.855</td><td>0.826</td><td>0.676</td><td>0.744</td><td>0.868</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.852</td><td>0.845</td><td>0.682</td><td>0.755</td><td>0.874</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.764</td><td>0.833</td><td>0.565</td><td>0.659</td><td>0.825</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.745</td><td>0.812</td><td>0.511</td><td>0.627</td><td>0.808</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.688</td><td>0.818</td><td>0.408</td><td>0.544</td><td>0.767</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.523</td><td>0.735</td><td>0.362</td><td>0.485</td><td>0.736</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.465</td><td>0.523</td><td>0.209</td><td>0.329</td><td>0.658</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Tab Content for InterPro - Binding Sites -->
+                     <div id="tab-mixed-interpro-bind" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>F1-Positive</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.912</td><td>0.859</td><td>0.859</td><td>0.859</td><td class="highlight-bronze">0.926</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-gold">0.907</td><td>0.849</td><td class="highlight-bronze">0.866</td><td class="highlight-gold">0.857</td><td class="highlight-gold">0.925</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.904</td><td class="highlight-bronze">0.869</td><td>0.830</td><td>0.849</td><td>0.921</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.857</td><td>0.855</td><td>0.694</td><td>0.766</td><td>0.878</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.838</td><td>0.827</td><td>0.768</td><td>0.796</td><td>0.893</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.807</td><td>0.813</td><td>0.705</td><td>0.755</td><td>0.871</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.801</td><td>0.818</td><td>0.705</td><td>0.757</td><td>0.873</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.611</td><td>0.730</td><td>0.519</td><td>0.607</td><td>0.795</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Tab Content for InterPro - Evo Pressure -->
+                     <div id="tab-mixed-interpro-evo" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>F1-Positive</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                           <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.899</td><td>0.856</td><td class="highlight-bronze">0.806</td><td class="highlight-bronze">0.831</td><td class="highlight-bronze">0.910</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-gold">0.895</td><td class="highlight-bronze">0.882</td><td>0.735</td><td class="highlight-gold">0.802</td><td class="highlight-gold">0.896</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.862</td><td>0.816</td><td>0.783</td><td>0.799</td><td>0.894</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.771</td><td>0.805</td><td>0.610</td><td>0.694</td><td>0.839</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.734</td><td>0.809</td><td>0.554</td><td>0.658</td><td>0.820</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.724</td><td>0.819</td><td>0.520</td><td>0.636</td><td>0.809</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.715</td><td>0.790</td><td>0.507</td><td>0.618</td><td>0.800</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.342</td><td>0.810</td><td>0.091</td><td>0.164</td><td>0.569</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Tab Content for InterPro - Motif -->
+                    <div id="tab-mixed-interpro-motif" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                             <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>F1-Positive</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                           <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.884</td><td>0.846</td><td class="highlight-bronze">0.789</td><td class="highlight-bronze">0.817</td><td class="highlight-bronze">0.895</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.874</td><td class="highlight-bronze">0.851</td><td>0.748</td><td>0.796</td><td>0.884</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.855</td><td>0.824</td><td>0.775</td><td>0.799</td><td>0.885</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.802</td><td>0.841</td><td>0.615</td><td>0.710</td><td>0.837</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.779</td><td>0.784</td><td>0.678</td><td>0.727</td><td>0.845</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.767</td><td>0.821</td><td>0.582</td><td>0.681</td><td>0.821</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.716</td><td>0.772</td><td>0.550</td><td>0.642</td><td>0.799</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.661</td><td>0.748</td><td>0.525</td><td>0.618</td><td>0.786</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                     <!-- Tab Content for InterPro - Domain -->
+                    <div id="tab-mixed-interpro-dom" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                             <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>F1-Positive</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                           <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.673</td><td class="highlight-bronze">0.674</td><td>0.467</td><td class="highlight-bronze">0.552</td><td class="highlight-bronze">0.700</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-gold">0.666</td><td>0.661</td><td>0.467</td><td>0.547</td><td>0.696</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.642</td><td>0.635</td><td class="highlight-bronze">0.472</td><td class="highlight-gold">0.542</td><td>0.689</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.634</td><td>0.648</td><td>0.433</td><td>0.519</td><td>0.679</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.591</td><td>0.636</td><td>0.353</td><td>0.454</td><td>0.644</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.574</td><td>0.632</td><td>0.322</td><td>0.427</td><td>0.629</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.560</td><td>0.591</td><td>0.344</td><td>0.435</td><td>0.636</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                           </tbody>
+                        </table>
+                    </div>
+                    <!-- Tab Content for BindP & Epi -->
+                    <div id="tab-mixed-bindb" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>F1-Positive</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.446</td><td class="highlight-silver">0.605</td><td class="highlight-bronze">0.329</td><td class="highlight-bronze">0.427</td><td class="highlight-bronze">0.707</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-gold">0.421</td><td class="highlight-bronze">0.634</td><td>0.260</td><td>0.369</td><td>0.678</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.408</td><td>0.598</td><td>0.289</td><td>0.390</td><td>0.689</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.340</td><td>0.547</td><td>0.238</td><td>0.332</td><td>0.659</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-mixed-epi" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                           <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr>
+                                    <th class="px-4 py-3">Model</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>AUPR</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>F1-Positive</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                </tr>
+                            </thead>
+                           <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">0.186</td><td class="highlight-bronze">1.000</td><td class="highlight-bronze">0.001</td><td class="highlight-bronze">0.002</td><td class="highlight-bronze">0.480</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.174</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.479</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.169</td><td class="highlight-bronze">1.000</td><td class="highlight-bronze">0.001</td><td class="highlight-bronze">0.002</td><td class="highlight-bronze">0.480</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.167</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.479</td></tr>
+                           </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard 2: Fragment-level Classification -->
+            <div class="bg-white rounded-lg p-6 border border-gray-200 mb-12">
+                <h4 class="text-2xl font-semibold text-gray-900 mb-1">Fragment-level Multi-class Classification</h4>
+                <p class="text-gray-600 mb-6">Performance on InterPro datasets (MF50 split). Higher is better.</p>
+                <div id="fragment-tabs-buttons" class="flex flex-wrap border-b border-gray-300 mb-6">
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-frag-act">Act (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-frag-bind">BindI (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-frag-evo">Evo (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-frag-motif">Motif (InterPro)</button>
+                </div>
+                <div class="table-responsive">
+                    <div id="tab-frag-act" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Accuracy</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>MCC</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">0.928</td><td class="highlight-bronze">0.830</td><td class="highlight-bronze">0.830</td><td class="highlight-bronze">0.825</td><td class="highlight-bronze">0.926</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td class="highlight-gold">0.907</td><td class="highlight-gold">0.826</td><td class="highlight-gold">0.833</td><td class="highlight-gold">0.822</td><td class="highlight-gold">0.906</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">0.928</td><td>0.810</td><td>0.823</td><td class="highlight-silver">0.807</td><td>0.926</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.891</td><td>0.773</td><td>0.774</td><td>0.764</td><td>0.889</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.824</td><td>0.661</td><td>0.665</td><td>0.647</td><td>0.821</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.819</td><td>0.659</td><td>0.670</td><td>0.647</td><td>0.815</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.814</td><td>0.603</td><td>0.634</td><td>0.605</td><td>0.810</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.736</td><td>0.618</td><td>0.636</td><td>0.609</td><td>0.731</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-frag-bind" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                           <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Accuracy</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>MCC</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">0.986</td><td class="highlight-bronze">0.968</td><td class="highlight-bronze">0.956</td><td class="highlight-bronze">0.957</td><td class="highlight-bronze">0.984</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.976</td><td>0.943</td><td>0.929</td><td>0.931</td><td>0.971</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td class="highlight-gold">0.972</td><td>0.901</td><td>0.882</td><td>0.884</td><td class="highlight-gold">0.967</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">0.972</td><td class="highlight-gold">0.940</td><td class="highlight-gold">0.948</td><td class="highlight-gold">0.931</td><td class="highlight-gold">0.967</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.937</td><td>0.834</td><td>0.819</td><td>0.809</td><td>0.926</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.934</td><td>0.755</td><td>0.775</td><td>0.753</td><td>0.922</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.927</td><td>0.838</td><td>0.794</td><td>0.790</td><td>0.914</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.920</td><td>0.733</td><td>0.732</td><td>0.718</td><td>0.906</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-frag-evo" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                             <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Accuracy</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>MCC</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">0.950</td><td class="highlight-bronze">0.868</td><td class="highlight-bronze">0.875</td><td class="highlight-bronze">0.863</td><td class="highlight-bronze">0.950</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">0.939</td><td class="highlight-gold">0.857</td><td class="highlight-gold">0.858</td><td class="highlight-gold">0.849</td><td class="highlight-gold">0.938</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.915</td><td>0.804</td><td>0.807</td><td class="highlight-silver">0.793</td><td>0.915</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.914</td><td>0.763</td><td>0.768</td><td>0.757</td><td>0.913</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.866</td><td>0.727</td><td>0.729</td><td>0.716</td><td>0.865</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.853</td><td>0.681</td><td>0.684</td><td>0.667</td><td>0.852</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.841</td><td>0.682</td><td>0.682</td><td>0.669</td><td>0.840</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.828</td><td>0.644</td><td>0.646</td><td>0.627</td><td>0.827</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-frag-motif" class="tab-content">
+                         <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Accuracy</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Precision</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Recall</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>Macro-F1</th>
+                                    <th class="px-4 py-2 text-center" data-sortable>MCC</th>
+                                </tr>
+                            </thead>
+                           <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.914</td><td class="highlight-bronze">0.564</td><td>0.556</td><td class="highlight-bronze">0.556</td><td>0.907</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">0.927</td><td class="highlight-silver">0.546</td><td class="highlight-silver">0.562</td><td class="highlight-gold">0.552</td><td class="highlight-bronze">0.921</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.906</td><td>0.547</td><td>0.543</td><td class="highlight-silver">0.542</td><td>0.898</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-35M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td>0.901</td><td>0.509</td><td>0.505</td><td>0.504</td><td>0.892</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-BASE</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.901</td><td>0.508</td><td>0.501</td><td>0.499</td><td>0.892</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T30</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.884</td><td>0.458</td><td>0.461</td><td>0.457</td><td>0.875</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>0.884</td><td>0.455</td><td>0.458</td><td>0.452</td><td>0.875</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">GVP-GNN</td><td class="px-4 py-3 text-xs text-gray-500">Structure-only</td><td>0.807</td><td>0.387</td><td>0.371</td><td>0.370</td><td>0.791</td></tr>
+                           </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Leaderboard 3: Pairwise Functional Similarity Scoring (F50) -->
+            <div class="bg-white rounded-lg p-6 border border-gray-200 mb-12">
+                <h4 class="text-2xl font-semibold text-gray-900 mb-1">Pairwise Functional Similarity Scoring (F50)</h4>
+                <p class="text-gray-600 mb-6">Performance on fragment-level splits (F50). Metric is AUC (%). Higher is better.</p>
+                <div id="f50-pairwise-tabs-buttons" class="flex flex-wrap border-b border-gray-300 mb-6">
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-f50-act">Act (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-f50-bind">BindI (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-f50-evo">Evo (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-f50-motif">Motif (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-f50-dom">Dom (InterPro)</button>
+                </div>
+                 <div class="table-responsive">
+                    <div id="tab-f50-act" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">TM-VEC</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">96.2</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">FOLDSEEK (3Di-AA)</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-gold">91.8</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-silver">71.4</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM-1B</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>66.5</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">BLAST</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td>65.9</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-f50-bind" class="tab-content">
+                         <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTT5</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Enc-Dec</td><td class="highlight-bronze">98.5</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">TM-VEC</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">98.2</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">FOLDSEEK (3Di-AA)</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-silver">96.1</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>85.1</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">BLAST</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td>52.9</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-f50-evo" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">FOLDSEEK (3Di-AA)</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-bronze">99.0</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">TM-VEC</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">98.6</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-silver">85.3</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">BLAST</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td>52.4</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-f50-motif" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTT5</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Enc-Dec</td><td class="highlight-bronze">98.2</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">TM-VEC</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">98.2</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">FOLDSEEK (3Di-AA)</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-gold">96.5</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM-1B</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-silver">89.0</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>84.9</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">BLAST</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td>51.1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-f50-dom" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">TM-VEC</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">99.4</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">FOLDSEEK (3Di-AA)</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-gold">98.5</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTT5</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Enc-Dec</td><td class="highlight-silver">98.0</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>92.1</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">BLAST</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td>50.2</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard 4: Pairwise Functional Similarity Scoring (P50) -->
+            <div class="bg-white rounded-lg p-6 border border-gray-200">
+                <h4 class="text-2xl font-semibold text-gray-900 mb-1">Pairwise Functional Similarity Scoring (P50)</h4>
+                <p class="text-gray-600 mb-6">Performance on protein-level splits (P50). Metric is AUC (%). Higher is better.</p>
+                <div id="p50-pairwise-tabs-buttons" class="flex flex-wrap border-b border-gray-300 mb-6">
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-p50-act">Act (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-p50-bind">BindI (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-p50-evo">Evo (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-p50-motif">Motif (InterPro)</button>
+                    <button class="tab-button py-2 px-4 rounded-t-md -mb-px border-b-2 border-transparent text-gray-500 hover:text-gray-800" data-target="tab-p50-dom">Dom (InterPro)</button>
+                </div>
+                 <div class="table-responsive">
+                    <div id="tab-p50-act" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-base</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-bronze">90.4</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">TM-ALIGN</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-gold">89.9</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-silver">79.1</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>68.7</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>68.2</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM-1B</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>62.3</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">BLAST</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td>52.4</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-p50-bind" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-bronze">98.1</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">TM-ALIGN</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-gold">96.5</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-silver">90.6</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-base</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>88.9</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>73.8</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>54.6</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">BLAST</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td>49.9</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-p50-evo" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                             <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                            <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">FOLDSEEK (3Di-AA)</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-bronze">99.0</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">TM-VEC</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">98.2</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-silver">88.4</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>58.4</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tab-p50-motif" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                            <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                           <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">FOLDSEEK (3Di-AA)</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-bronze">96.5</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ESM2-T33</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-gold">84.5</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTSSN</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-silver">82.9</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>57.0</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">BLAST</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td>54.0</td></tr>
+                           </tbody>
+                        </table>
+                    </div>
+                     <div id="tab-p50-dom" class="tab-content">
+                        <table class="w-full text-sm text-left sortable-table" data-sort-col="2">
+                             <thead class="text-xs text-gray-700 uppercase sticky-header">
+                                <tr><th class="px-4 py-3">Model</th><th class="px-4 py-3">Type</th><th class="px-4 py-2 text-center" data-sortable>AUC (%)</th></tr>
+                            </thead>
+                           <tbody class="text-gray-600 divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">FOLDSEEK (3Di-AA)</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td class="highlight-bronze">98.5</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">SAPROT-650M</td><td class="px-4 py-3 text-xs text-gray-500">Seq-Structure</td><td class="highlight-gold">91.7</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">ANKH-base</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td class="highlight-silver">86.7</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">PROTBERT</td><td class="px-4 py-3 text-xs text-gray-500">Sequence-only</td><td>63.9</td></tr>
+                                <tr class="hover:bg-gray-100"><td class="px-6 py-3">BLAST</td><td class="px-4 py-3 text-xs text-gray-500">Alignment</td><td>56.2</td></tr>
+                           </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-500">
+            <p>&copy; 2025 Anonymous Authors. For double-blind review purposes.</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Tab functionality
+            document.querySelectorAll('[id$="-tabs-buttons"]').forEach(container => {
+                const tabButtons = container.querySelectorAll('.tab-button');
+                const tabContents = container.parentElement.querySelectorAll('.tab-content');
+
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const targetId = button.dataset.target;
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        tabContents.forEach(content => content.classList.remove('active'));
+                        document.getElementById(targetId).classList.add('active');
+                    });
+                });
+                if(tabButtons.length > 0) {
+                    tabButtons[0].classList.add('active');
+                    document.getElementById(tabButtons[0].dataset.target).classList.add('active');
+                }
+            });
+
+            // Sorting functionality
+            const sortTableByColumn = (table, column, dir = 'desc') => {
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const isNumeric = !isNaN(parseFloat(rows[0].querySelectorAll('td')[column].textContent));
+
+                const sortedRows = rows.sort((a, b) => {
+                    const aVal = a.querySelectorAll('td')[column].textContent.trim();
+                    const bVal = b.querySelectorAll('td')[column].textContent.trim();
+                    
+                    const aNum = isNumeric ? parseFloat(aVal) || -Infinity : aVal;
+                    const bNum = isNumeric ? parseFloat(bVal) || -Infinity : bVal;
+
+                    if (dir === 'asc') {
+                        return aNum > bNum ? 1 : -1;
+                    } else {
+                        return bNum > aNum ? 1 : -1;
+                    }
+                });
+
+                tbody.innerHTML = '';
+                sortedRows.forEach(row => tbody.appendChild(row));
+
+                // Update arrows
+                table.querySelectorAll('th[data-sortable]').forEach(th => {
+                    const arrow = th.querySelector('.sort-arrow');
+                    if (arrow) {
+                        arrow.innerHTML = '&#9660;'; // down arrow
+                        arrow.classList.remove('asc', 'desc');
+                    }
+                });
+                
+                const currentTh = table.querySelector(`thead th:nth-child(${column + 1})`);
+                if(currentTh) {
+                    const arrow = currentTh.querySelector('.sort-arrow');
+                    if (dir === 'asc') {
+                        arrow.innerHTML = '&#9650;'; // up arrow
+                        arrow.classList.add('asc');
+                    } else {
+                        arrow.classList.add('desc');
+                    }
+                    currentTh.dataset.sortDir = dir;
+                }
+            };
+
+            document.querySelectorAll('.sortable-table').forEach(table => {
+                const headers = table.querySelectorAll('th[data-sortable]');
+                headers.forEach((header) => {
+                    if (!header.querySelector('.sort-arrow')) {
+                        header.innerHTML += '<span class="sort-arrow">&#9660;</span>';
+                    }
+                    const colIndex = Array.from(header.parentNode.children).indexOf(header);
+
+                    header.addEventListener('click', () => {
+                        const currentDir = header.dataset.sortDir || 'desc';
+                        const newDir = currentDir === 'desc' ? 'asc' : 'desc';
+                        sortTableByColumn(table, colIndex, newDir);
+                    });
+                });
+
+                // Default sort
+                const defaultSortCol = parseInt(table.dataset.sortCol, 10);
+                if (!isNaN(defaultSortCol)) {
+                    sortTableByColumn(table, defaultSortCol, 'desc');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
